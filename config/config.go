@@ -14,7 +14,7 @@ type Set struct {
 	Network     string   `json:"Network,omitempty" yaml:"Network,omitempty"`
 	Environment []string `json:"Environment,omitempty" yaml:"Environment,omitempty"`
 	// Variables that will be passed onto the Spartan
-	Cmds []([]string) `json:"Commands" yaml"Commands"`
+	Cmds []([]string) `json:"Commands" yaml:"Commands"`
 }
 
 // Load will take a given path map that to the Set struct
