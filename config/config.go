@@ -28,3 +28,12 @@ func (s *Set) Load(path string) error {
 	}
 	return yaml.Unmarshal(buff, s)
 }
+
+// Default creates the default config that can be used if nothing is defined
+func Default() *Set {
+	return &Set{
+		Network:     "bridge",
+		Environment: []string{},
+		Cmds:        []([]string){},
+	}
+}
