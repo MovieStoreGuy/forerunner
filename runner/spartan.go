@@ -55,7 +55,7 @@ func (s *Spartan) Start(image string) error {
 	return s.runCommands(s.conf.Cmds...)
 }
 
-func (s *Spartan) runCommands(cmds ...[]string) error {
+func (s *Spartan) runCommands(cmds ...string) error {
 	for _, str := range cmds {
 		cmd := strings.Split(str, " \t")
 		c := exec.Command(cmd[0], cmd[1:]...)
