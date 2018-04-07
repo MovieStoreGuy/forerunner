@@ -6,13 +6,13 @@
 Forerunner is a Golang application to allow for automated CI/CD manor of testing of Docker images.
 
 ## Requirements
-Currently, in order to build Forerunner you will need:
-- Golang v1.7+
+iCurrently, in order to build Forerunner you will need:
+- Golang v1.8+
 
 To run ForeRunner, you will need:
 - Docker install
     - Docker daemon running
-- Golang v1.7+ 
+- Golang v1.8+ 
     - If you are running this via the source code
 
 ## Usage
