@@ -1,14 +1,33 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
+	"github.com/MovieStoreGuy/forerunner/config"
 	"github.com/MovieStoreGuy/forerunner/runner"
 )
 
+var (
+	conf = config.Default()
+
+	confpath string
+)
+
+func init() {
+	flag.StringVar(&confpath, "path", "", "allows the user to define their own runner config instead of the default")
+}
+
 func main() {
-	mchief, err := runner.New(nil)
+	flag.Parse()
+	if confpath != "" {
+		if err := conf.Load(confpath); err != nil {
+			fmt.Println("Unable to load config\n\t", err)
+			os.Exit(-1)
+		}
+	}
+	mchief, err := runner.New(conf)
 	if err != nil {
 		fmt.Println("An issued occured\n\t", err)
 		os.Exit(1)
