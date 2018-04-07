@@ -42,12 +42,23 @@ func New(conf *config.Set) (*Spartan, error) {
 
 // Start will run the docker image
 func (s *Spartan) Start(image string) error {
+	mode := container.NetworkMode(s.conf.Network)
+	switch {
+	case mode.IsBridge():
+		fmt.Println("Is a Bridge setting")
+	case mode.IsHost():
+		fmt.Println("Is a host setting")
+	default:
+		fmt.Println("No fucking idea")
+	}
 	resp, err := s.cli.ContainerCreate(s.ctx, &container.Config{
 		Image: image,
-	}, &container.HostConfig{NetworkMode: container.NetworkMode(s.conf.Network)}, nil, "")
+		Env:   s.conf.Environment,
+	}, &container.HostConfig{NetworkMode: mode}, nil, "")
 	if err != nil {
 		return err
 	}
+	fmt.Println("Do I make it this far?")
 	if err = s.cli.ContainerStart(s.ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
 		return err
 	}
@@ -57,7 +68,7 @@ func (s *Spartan) Start(image string) error {
 
 func (s *Spartan) runCommands(cmds ...string) error {
 	for _, str := range cmds {
-		cmd := strings.Split(str, " \t")
+		cmd := strings.Split(str, " ")
 		c := exec.Command(cmd[0], cmd[1:]...)
 		stdout, err := c.StdoutPipe()
 		if err != nil {
@@ -66,12 +77,6 @@ func (s *Spartan) runCommands(cmds ...string) error {
 		stderr, err := c.StderrPipe()
 		if err != nil {
 			return errors.New("Unable to connect stderr")
-		}
-		writer := func(o io.ReadCloser) {
-			scanner := bufio.NewScanner(o)
-			for scanner.Scan() {
-				fmt.Println(scanner.Text())
-			}
 		}
 		// Write outputs as soon as they are received
 		go writer(stdout)
@@ -87,6 +92,12 @@ func (s *Spartan) runCommands(cmds ...string) error {
 // created with it is also cleaned up
 func (s *Spartan) Stop() error {
 	for _, id := range s.ids {
+		logs, err := s.cli.ContainerLogs(s.ctx, id, types.ContainerLogsOptions{ShowStdout: true, ShowStderr: true})
+		if err != nil {
+			return err
+		}
+		fmt.Println("Container logs:", id)
+		writer(logs)
 		if err := s.cli.ContainerStop(s.ctx, id, nil); err != nil {
 			return err
 		}
@@ -95,4 +106,11 @@ func (s *Spartan) Stop() error {
 		}
 	}
 	return nil
+}
+
+func writer(o io.ReadCloser) {
+	scanner := bufio.NewScanner(o)
+	for scanner.Scan() {
+		fmt.Println(scanner.Text())
+	}
 }

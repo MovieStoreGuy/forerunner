@@ -18,22 +18,27 @@ type Set struct {
 }
 
 // Load will take a given path map that to the Set struct
-func (s *Set) Load(path string) error {
+func Load(path string) (*Set, error) {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
-		return err
+		return nil, err
 	}
 	buff, err := ioutil.ReadFile(path)
 	if err != nil {
-		return err
+		return nil, err
 	}
-	return yaml.Unmarshal(buff, s)
+	var conf Set
+	err = yaml.Unmarshal(buff, &conf)
+	if conf.Network == "" {
+		conf.Network = "bridge"
+	}
+	return &conf, err
 }
 
 // Default creates the default config that can be used if nothing is defined
 func Default() *Set {
 	return &Set{
 		Network:     "bridge",
-		Environment: []string{},
+		Environment: []string{"shit=poop"},
 		Cmds:        []string{},
 	}
 }

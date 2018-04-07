@@ -22,11 +22,14 @@ func init() {
 func main() {
 	flag.Parse()
 	if confpath != "" {
-		if err := conf.Load(confpath); err != nil {
+		c, err := config.Load(confpath)
+		if err != nil {
 			fmt.Println("Unable to load config\n\t", err)
 			os.Exit(-1)
 		}
+		conf = c
 	}
+	fmt.Printf("Config is: %+v\n", conf)
 	mchief, err := runner.New(conf)
 	if err != nil {
 		fmt.Println("An issued occured\n\t", err)
