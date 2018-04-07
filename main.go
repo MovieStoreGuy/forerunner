@@ -32,7 +32,7 @@ func main() {
 	fmt.Printf("Config is: %+v\n", conf)
 	mchief, err := runner.New(conf)
 	if err != nil {
-		fmt.Println("An issued occured\n\t", err)
+		fmt.Println("An issued occurred\n\t", err)
 		os.Exit(1)
 	}
 	defer func() {
