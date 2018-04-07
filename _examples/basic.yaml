@@ -1,0 +1,8 @@
+---
+Commands:
+    - echo hello world
+    - echo $?
+
+Network: bridge
+Environment:
+    - STUPID_ENV=poop
