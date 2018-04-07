@@ -43,14 +43,6 @@ func New(conf *config.Set) (*Spartan, error) {
 // Start will run the docker image
 func (s *Spartan) Start(image string) error {
 	mode := container.NetworkMode(s.conf.Network)
-	switch {
-	case mode.IsBridge():
-		fmt.Println("Is a Bridge setting")
-	case mode.IsHost():
-		fmt.Println("Is a host setting")
-	default:
-		fmt.Println("No fucking idea")
-	}
 	resp, err := s.cli.ContainerCreate(s.ctx, &container.Config{
 		Image: image,
 		Env:   s.conf.Environment,
@@ -58,7 +50,6 @@ func (s *Spartan) Start(image string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println("Do I make it this far?")
 	if err = s.cli.ContainerStart(s.ctx, resp.ID, types.ContainerStartOptions{}); err != nil {
 		return err
 	}
