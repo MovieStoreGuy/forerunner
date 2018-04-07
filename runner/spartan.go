@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"io"
 	"os/exec"
+	"strings"
 
 	"github.com/MovieStoreGuy/forerunner/config"
 	"github.com/docker/docker/api/types"
@@ -43,7 +44,7 @@ func New(conf *config.Set) (*Spartan, error) {
 func (s *Spartan) Start(image string) error {
 	resp, err := s.cli.ContainerCreate(s.ctx, &container.Config{
 		Image: image,
-	}, nil, nil, "")
+	}, &container.HostConfig{NetworkMode: container.NetworkMode(s.conf.Network)}, nil, "")
 	if err != nil {
 		return err
 	}
@@ -55,7 +56,8 @@ func (s *Spartan) Start(image string) error {
 }
 
 func (s *Spartan) runCommands(cmds ...[]string) error {
-	for _, cmd := range cmds {
+	for _, str := range cmds {
+		cmd := strings.Split(str, " \t")
 		c := exec.Command(cmd[0], cmd[1:]...)
 		stdout, err := c.StdoutPipe()
 		if err != nil {
