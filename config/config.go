@@ -22,7 +22,7 @@ func (s *Set) Load(path string) error {
 	if _, err := os.Stat(path); os.IsNotExist(err) {
 		return err
 	}
-	buff, err := ioutil.ReadAll(path)
+	buff, err := ioutil.ReadFile(path)
 	if err != nil {
 		return err
 	}
