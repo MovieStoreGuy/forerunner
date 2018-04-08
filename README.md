@@ -37,3 +37,5 @@ Environemnt:
     - <var>=<value>
     - ...
 ```
+In the config, the commands are the shell script you wish to run on the host container to ensure that the container is configured correctly.
+This means you could run your automation tests against it.
