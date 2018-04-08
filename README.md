@@ -16,3 +16,24 @@ To run ForeRunner, you will need:
     - If you are running this via the source code
 
 ## Usage
+In order to use the forerunner application, you will need to do the following:
+```sh
+forerunner --path path/to/config.yaml image [images...]
+```
+With forerunner, it is possuible to test mutliple images consecutively but does require
+that they each use the same forerunner config.
+
+The yaml file looks like this:
+```yaml
+---
+# Non Optional Arguements
+Commands:
+    - cmd1
+    - cmd2
+    - cmd3
+# Optional configs
+Network: <bridge|host|none|custom>
+Environemnt:
+    - <var>=<value>
+    - ...
+```
