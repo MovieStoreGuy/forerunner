@@ -1,0 +1,5 @@
+{
+    "Network":"host",
+    "Environment": ["shitvar=POOP"],
+    "Commands": ["echo hello world", "echo $?"]
+}
