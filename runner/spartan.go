@@ -42,6 +42,7 @@ func New(conf *config.Set) (*Spartan, error) {
 
 // Start will run the docker image
 func (s *Spartan) Start(image string) error {
+	// Need to querry the host to see if the image exist
 	mode := container.NetworkMode(s.conf.Network)
 	resp, err := s.cli.ContainerCreate(s.ctx, &container.Config{
 		Image: image,

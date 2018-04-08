@@ -10,7 +10,7 @@ import (
 )
 
 var (
-	conf = config.Default()
+	conf *config.Set
 
 	confpath string
 )
@@ -29,7 +29,6 @@ func main() {
 		}
 		conf = c
 	}
-	fmt.Printf("Config is: %+v\n", conf)
 	mchief, err := runner.New(conf)
 	if err != nil {
 		fmt.Println("An issued occurred\n\t", err)
@@ -41,7 +40,7 @@ func main() {
 			os.Exit(-1)
 		}
 	}()
-	for _, image := range os.Args[1:] {
+	for _, image := range flag.Args() {
 		if err = mchief.Start(image); err != nil {
 			fmt.Println("Failed to start the runner\n\t", err)
 			return

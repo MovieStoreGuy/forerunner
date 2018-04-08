@@ -38,7 +38,7 @@ func Load(path string) (*Set, error) {
 func Default() *Set {
 	return &Set{
 		Network:     "bridge",
-		Environment: []string{"shit=poop"},
+		Environment: []string{},
 		Cmds:        []string{},
 	}
 }
