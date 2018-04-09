@@ -1,15 +1,14 @@
 package runner
 
 import (
-	"bufio"
 	"context"
 	"errors"
 	"fmt"
-	"io"
 	"os/exec"
 	"strings"
 
 	"github.com/MovieStoreGuy/forerunner/config"
+	"github.com/MovieStoreGuy/forerunner/cortana"
 	"github.com/docker/docker/api/types"
 	"github.com/docker/docker/api/types/container"
 	"github.com/docker/docker/client"
@@ -18,10 +17,11 @@ import (
 // Spartan is the object type to allow management of
 // running the docker image
 type Spartan struct {
-	cli  *client.Client
-	ctx  context.Context
-	conf *config.Set
-	ids  []string
+	cli     *client.Client
+	ctx     context.Context
+	conf    *config.Set
+	ids     []string
+	Cortana *cortana.Sentient
 }
 
 // New will create an instance of Spartan with the desired config
@@ -34,9 +34,10 @@ func New(conf *config.Set) (*Spartan, error) {
 		conf = config.Default()
 	}
 	return &Spartan{
-		cli:  cli,
-		ctx:  context.Background(),
-		conf: conf,
+		cli:     cli,
+		ctx:     context.Background(),
+		conf:    conf,
+		Cortana: cortana.New(),
 	}, nil
 }
 
@@ -73,8 +74,8 @@ func (s *Spartan) runCommands(cmds ...string) error {
 			return errors.New("Unable to connect stderr")
 		}
 		// Write outputs as soon as they are received
-		go writer(stdout)
-		go writer(stderr)
+		go s.Cortana.Follow(stdout)
+		go s.Cortana.Follow(stderr)
 		if err = c.Run(); err != nil {
 			return err
 		}
@@ -90,8 +91,7 @@ func (s *Spartan) Stop() error {
 		if err != nil {
 			return err
 		}
-		fmt.Println("Container logs:", id)
-		writer(logs)
+		s.Cortana.Follow(logs)
 		if err := s.cli.ContainerStop(s.ctx, id, nil); err != nil {
 			return err
 		}
@@ -113,11 +113,4 @@ func (s *Spartan) containerExists(image string) bool {
 		}
 	}
 	return false
-}
-
-func writer(o io.ReadCloser) {
-	scanner := bufio.NewScanner(o)
-	for scanner.Scan() {
-		fmt.Println(scanner.Text())
-	}
 }
