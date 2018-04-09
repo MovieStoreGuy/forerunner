@@ -42,7 +42,9 @@ func New(conf *config.Set) (*Spartan, error) {
 
 // Start will run the docker image
 func (s *Spartan) Start(image string) error {
-	// Need to querry the host to see if the image exist
+	if !s.containerExists(image) {
+		return fmt.Errorf("The container %s doesn't appear to exist", image)
+	}
 	mode := container.NetworkMode(s.conf.Network)
 	resp, err := s.cli.ContainerCreate(s.ctx, &container.Config{
 		Image: image,
@@ -98,6 +100,19 @@ func (s *Spartan) Stop() error {
 		}
 	}
 	return nil
+}
+
+func (s *Spartan) containerExists(image string) bool {
+	images, err := s.cli.ImageList(s.ctx, types.ImageListOptions{All: true})
+	if err != nil {
+		return false
+	}
+	for _, sum := range images {
+		if strings.Contains(strings.Join(sum.RepoTags, " "), image) {
+			return true
+		}
+	}
+	return false
 }
 
 func writer(o io.ReadCloser) {
